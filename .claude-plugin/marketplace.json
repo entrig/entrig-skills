@@ -1,0 +1,17 @@
+{
+  "name": "entrig-skills",
+  "metadata": {
+    "description": "Entrig skills for Claude Code — push notifications for Supabase"
+  },
+  "owner": {
+    "name": "Entrig",
+    "email": "team@entrig.com"
+  },
+  "plugins": [
+    {
+      "name": "entrig",
+      "source": "./",
+      "category": "developer-tools"
+    }
+  ]
+}

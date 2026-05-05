@@ -1,0 +1,11 @@
+{
+  "mcpServers": {
+    "entrig": {
+      "type": "http",
+      "url": "https://mcp.entrig.com/beta",
+      "headers": {
+        "Authorization": "Bearer ${ENTRIG_API_KEY}"
+      }
+    }
+  }
+}

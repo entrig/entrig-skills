@@ -1,0 +1,28 @@
+{
+  "name": "entrig",
+  "displayName": "Entrig",
+  "description": "Skills and MCP server for Entrig — push notifications for Supabase, triggered by database events. SDK integration for Flutter, Expo, React Native, iOS, Android, Capacitor + natural-language notification management via MCP.",
+  "version": "0.1.0",
+  "skills": "./skills/",
+  "mcpServers": "./.mcp.json",
+  "author": {
+    "name": "Entrig",
+    "url": "https://entrig.com",
+    "email": "team@entrig.com"
+  },
+  "homepage": "https://entrig.com",
+  "license": "MIT",
+  "keywords": [
+    "push-notifications",
+    "supabase",
+    "entrig",
+    "fcm",
+    "apns",
+    "flutter",
+    "expo",
+    "react-native",
+    "ios",
+    "android",
+    "capacitor"
+  ]
+}
