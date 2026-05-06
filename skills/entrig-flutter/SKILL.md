@@ -11,7 +11,7 @@ description: >
   get the Entrig MCP server loaded so the user can create/manage notifications from the editor.
 metadata:
   author: entrig
-  version: "0.5.0"
+  version: "0.6.0"
 ---
 
 # Entrig — Flutter
@@ -115,12 +115,7 @@ Before doing notification work, check whether the Entrig MCP tools are available
 
 **If the MCP tools are available** → proceed normally. Call `get_context` first; it returns the schema, existing notifications, and detailed reasoning instructions. Follow those instructions, confirm the proposal with the user in plain language, then call `create_notification`.
 
-**If the MCP tools are NOT available** → see [references/mcp-setup.md](references/mcp-setup.md). Walk the user through adding the server. Do **NOT** improvise:
-- Do NOT call Entrig's REST API directly.
-- Do NOT write SQL or set up `pg_net` triggers.
-- Do NOT default to telling them to use the dashboard.
-
-After the user adds the MCP server, they must fully restart the agent for the tools to load.
+**If the MCP tools are NOT available** → see [references/mcp-setup.md](references/mcp-setup.md) and add the server. A full agent restart is required after adding it.
 
 ## Common mistakes
 
@@ -136,8 +131,6 @@ After the user adds the MCP server, they must fully restart the agent for the to
 | 8 | Configuring FCM/APNs in Flutter code | Those go in the Entrig dashboard, not in the app. |
 | 9 | Multiple `onAuthStateChange` listeners | Extend the existing one — don't add a second. |
 | 10 | Adding `firebase_messaging` or other push packages | Entrig handles delivery itself. Don't combine with another push SDK unless you know the conflict surface. |
-| 11 | Calling Entrig REST API when MCP isn't loaded | Walk the user through MCP setup instead — see references/mcp-setup.md. |
-| 12 | Writing SQL or `pg_net` triggers manually | Never. Entrig manages all DB-side automatically when notifications are created via MCP. |
 
 ## What this skill does NOT do
 
