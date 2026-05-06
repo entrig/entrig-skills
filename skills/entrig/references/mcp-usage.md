@@ -4,15 +4,7 @@ Read when the user asks to create, update, list, or delete a notification trigge
 
 ## Setup check
 
-The Entrig MCP server is bundled with this plugin. The user needs:
-
-```bash
-export ENTRIG_API_KEY=<their_key>
-```
-
-If MCP tools aren't available (`get_context`, `create_notification`, etc.), tell the user to:
-1. Set `ENTRIG_API_KEY` in their environment.
-2. Restart their agent / reload the MCP connection.
+Before doing anything, confirm the Entrig MCP tools (`get_context`, `create_notification`, etc.) are actually available in your session. If they're not registered, see [mcp-setup.md](mcp-setup.md) — give the user the exact commands to add the server, tell them to fully restart the agent, and **stop**. Do not try to call the Entrig REST API directly.
 
 ## Standard flow for create/update
 

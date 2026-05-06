@@ -10,7 +10,7 @@ description: >
   and routes to framework-specific skills (entrig-flutter, etc.) for SDK integration.
 metadata:
   author: entrig
-  version: "0.1.0"
+  version: "0.2.0"
   homepage: https://entrig.com
 ---
 
@@ -56,7 +56,7 @@ If any of these are missing, stop and direct the user to [references/dashboard-s
 
 ## Entrig MCP server
 
-This plugin bundles the Entrig MCP server. Tools available:
+Notification creation, updates, and management require the **Entrig MCP server**. Tools:
 
 | Tool | Purpose |
 |---|---|
@@ -68,6 +68,16 @@ This plugin bundles the Entrig MCP server. Tools available:
 | `feature_request` | Log a feature request when the user asks for something unsupported |
 
 **The MCP server's tools have detailed instructions baked in.** Trust them — call `get_context` first, follow the reasoning steps it returns, confirm the proposal with the user in plain language, then call `create_notification`. See [references/mcp-usage.md](references/mcp-usage.md) for the full flow.
+
+### When the MCP server is NOT available
+
+If the Entrig MCP tools (`get_context`, `create_notification`, etc.) are not registered in your current session, **STOP**. Do not improvise:
+
+- Do NOT call Entrig's REST API directly.
+- Do NOT write SQL or create Supabase triggers manually.
+- Do NOT ask the user to use the dashboard as a substitute (unless they explicitly prefer it).
+
+Instead, tell the user the MCP server isn't loaded, and give them the exact commands to add it. See [references/mcp-setup.md](references/mcp-setup.md) for the message to deliver.
 
 ## Common mistakes
 
