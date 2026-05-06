@@ -11,27 +11,27 @@ description: >
   get the Entrig MCP server loaded so the user can create/manage notifications from the editor.
 metadata:
   author: entrig
-  version: "0.4.0"
+  version: "0.5.0"
 ---
 
 # Entrig — Flutter
 
 Wires the `entrig` Dart package into a Flutter project. Supabase-backed push notifications.
 
-## Pre-flight — confirm before any work
+## Pre-flight
 
-Verify this is a Flutter project: `pubspec.yaml` exists at the project root with `flutter:` under `dependencies`. If not, stop.
+Before doing any work, understand the project state:
 
-Then confirm with the user (do not proceed without):
+- Is this a Flutter project? (`pubspec.yaml` with `flutter:` under `dependencies` — if not, stop)
+- What platforms are targeted? (check if `ios/` and `android/` directories exist)
+- How is auth handled? (read `main.dart` and search for sign-in/sign-out patterns)
 
-1. **Entrig API key** — from https://entrig.com → project settings.
-2. **Supabase connected** at https://entrig.com (during onboarding).
-3. **FCM service account JSON uploaded** — required for Android targets.
-4. **APNs `.p8` key uploaded** (with Team ID, Bundle ID, Key ID) — required for iOS targets.
-5. **Target platforms** — iOS, Android, or both. Android is zero-config natively. iOS needs AppDelegate, entitlements, and Info.plist edits (step 2).
-6. **Auth source** — Supabase Auth or custom. Determines where `Entrig.register` / `Entrig.unregister` calls go.
+What is needed to proceed:
+- **Entrig API key** — from https://entrig.com → project settings. Having this implies Supabase is already connected.
+- **FCM service account JSON uploaded** in the Entrig dashboard — needed if the project targets Android.
+- **APNs `.p8` key uploaded** (with Team ID, Bundle ID, Key ID) in the Entrig dashboard — needed if the project targets iOS.
 
-If any prerequisite is missing, send the user to [references/dashboard-setup.md](references/dashboard-setup.md) and stop. The SDK won't deliver and notification creation will fail without these.
+Read what you can from the project first, then only ask the user about what's genuinely unclear or missing. If credentials are missing, send the user to [references/dashboard-setup.md](references/dashboard-setup.md) and stop.
 
 ## Quick integration
 
