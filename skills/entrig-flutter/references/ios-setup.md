@@ -1,56 +1,91 @@
-# iOS setup details
+# iOS setup
 
-What `dart run entrig:setup ios` does, when it fails, how to recover.
+Read and edit these three files. Show the diff to the user before saving each one.
 
-## What the CLI does
+## 1. `ios/Runner/AppDelegate.swift`
 
-When run from the Flutter project root:
+Read the file first. Then:
 
-1. Reads `ios/Runner/AppDelegate.swift`. If `EntrigPlugin.checkLaunchNotification` is already there, exits cleanly (no-op).
-2. Adds `import UserNotifications` and `import entrig` to the top.
-3. In `didFinishLaunchingWithOptions`: inserts `UNUserNotificationCenter.current().delegate = self` and `EntrigPlugin.checkLaunchNotification(launchOptions)` before the `return`.
-4. Appends four delegate methods to the class (`didRegisterForRemoteNotifications...`, `didFailToRegister...`, `userNotificationCenter willPresent`, `userNotificationCenter didReceive`).
-5. Reads `ios/Runner/Runner.entitlements`. Adds `<key>aps-environment</key><string>development</string>` if not present.
-6. Reads `ios/Runner/Info.plist`. Adds `UIBackgroundModes` with `remote-notification` and `fetch` if not present.
-7. Creates `.backup` files for each modified file.
+**Imports** — add at the top if not present:
+```swift
+import UserNotifications
+import entrig
+```
 
-## Failure mode 1: `Runner.entitlements` doesn't exist
+**Inside `didFinishLaunchingWithOptions`** — add before the `return`:
+```swift
+UNUserNotificationCenter.current().delegate = self
+EntrigPlugin.checkLaunchNotification(launchOptions)
+```
 
-The CLI prints a warning and skips entitlements. The user must create the file via Xcode (it can't be created cleanly from the command line because Xcode also needs to register the capability):
+**Delegate methods** — for each of the four below, check if it already exists:
+- If it does NOT exist, add the full method.
+- If it DOES exist, inject the Entrig call into the existing body. Do not duplicate the method.
 
-1. Open `ios/Runner.xcworkspace` in Xcode (not `.xcodeproj`)
-2. Select the Runner target → Signing & Capabilities tab
+```swift
+override func application(_ application: UIApplication,
+    didRegisterForRemoteNotificationsWithDeviceToken deviceToken: Data) {
+  EntrigPlugin.didRegisterForRemoteNotifications(deviceToken: deviceToken)
+}
+
+override func application(_ application: UIApplication,
+    didFailToRegisterForRemoteNotificationsWithError error: Error) {
+  EntrigPlugin.didFailToRegisterForRemoteNotifications(error: error)
+}
+
+override func userNotificationCenter(_ center: UNUserNotificationCenter,
+    willPresent notification: UNNotification,
+    withCompletionHandler completionHandler: @escaping (UNNotificationPresentationOptions) -> Void) {
+  EntrigPlugin.willPresentNotification(notification)
+  completionHandler(EntrigPlugin.foregroundPresentationOptions())
+}
+
+override func userNotificationCenter(_ center: UNUserNotificationCenter,
+    didReceive response: UNNotificationResponse,
+    withCompletionHandler completionHandler: @escaping () -> Void) {
+  EntrigPlugin.didReceiveNotification(response)
+  completionHandler()
+}
+```
+
+For `willPresent`: if the existing method already calls `completionHandler` with its own options, union them with `EntrigPlugin.foregroundPresentationOptions()`. Ask the user if the existing logic looks intentional.
+
+## 2. `ios/Runner/Runner.entitlements`
+
+If the file doesn't exist, the user must create it via Xcode — the file must be registered with Xcode's build system, not created on disk directly:
+
+1. Open `ios/Runner.xcworkspace` in Xcode
+2. Runner target → Signing & Capabilities tab
 3. Click `+ Capability` → Push Notifications
-4. Xcode creates `Runner.entitlements` with the `aps-environment` key
+4. Xcode creates `Runner.entitlements` automatically
 
-Then re-run `dart run entrig:setup ios` to verify everything is now in place.
+If the file exists, add inside the root `<dict>` if not present:
+```xml
+<key>aps-environment</key>
+<string>development</string>
+```
 
-## Failure mode 2: AppDelegate has existing delegate methods
+## 3. `ios/Runner/Info.plist`
 
-If `AppDelegate.swift` already defines any of:
-- `didRegisterForRemoteNotificationsWithDeviceToken`
-- `didFailToRegisterForRemoteNotificationsWithError`
-- `userNotificationCenter ... willPresent`
-- `userNotificationCenter ... didReceive`
+Add inside the root `<dict>` if not present:
+```xml
+<key>UIBackgroundModes</key>
+<array>
+  <string>fetch</string>
+  <string>remote-notification</string>
+</array>
+```
 
-…the CLI prints "manual integration needed" and exits **without modifying** the AppDelegate. (Imports and `didFinishLaunchingWithOptions` are also not modified in this case.)
+If `UIBackgroundModes` already exists, add the two strings to the existing array if missing.
 
-You patch manually — see [manual-appdelegate.md](manual-appdelegate.md) for the exact edits. Show the user the diff before applying.
+## After editing
 
-## Failure mode 3: Not running from project root
-
-If `ios/Runner/AppDelegate.swift` doesn't exist at the relative path, the CLI exits with an error. Make sure you're in the Flutter project root (the directory containing `pubspec.yaml`), not in `ios/` or anywhere else.
-
-## After setup
-
-- `cd ios && pod install` if pods are stale (or after first-time setup)
+- `cd ios && pod install` if pods are stale
 - Build to a real iOS device — simulators do not receive push notifications
-- The `.backup` files can be deleted after verifying everything works
 
-## If something is broken
+## Troubleshooting
 
-CocoaPods errors after install:
-
+CocoaPods errors:
 ```bash
 cd ios
 rm Podfile.lock
@@ -61,3 +96,7 @@ pod install
 ```
 
 Build cache issues: `flutter clean && flutter pub get && cd ios && pod install`.
+
+## CLI fallback
+
+Only use `dart run entrig:setup ios` if you cannot parse the AppDelegate structure. The CLI assumes an unmodified AppDelegate — if delegate methods already exist it bails without making any changes.

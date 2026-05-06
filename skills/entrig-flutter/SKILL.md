@@ -11,7 +11,7 @@ description: >
   get the Entrig MCP server loaded so the user can create/manage notifications from the editor.
 metadata:
   author: entrig
-  version: "0.3.0"
+  version: "0.4.0"
 ---
 
 # Entrig — Flutter
@@ -28,7 +28,7 @@ Then confirm with the user (do not proceed without):
 2. **Supabase connected** at https://entrig.com (during onboarding).
 3. **FCM service account JSON uploaded** — required for Android targets.
 4. **APNs `.p8` key uploaded** (with Team ID, Bundle ID, Key ID) — required for iOS targets.
-5. **Target platforms** — iOS, Android, or both. Android is zero-config natively. iOS needs a CLI run + Xcode capability.
+5. **Target platforms** — iOS, Android, or both. Android is zero-config natively. iOS needs AppDelegate, entitlements, and Info.plist edits (step 2).
 6. **Auth source** — Supabase Auth or custom. Determines where `Entrig.register` / `Entrig.unregister` calls go.
 
 If any prerequisite is missing, send the user to [references/dashboard-setup.md](references/dashboard-setup.md) and stop. The SDK won't deliver and notification creation will fail without these.
@@ -46,17 +46,13 @@ dependencies:
 
 Run `flutter pub get`.
 
-### 2. iOS setup (skip if Android-only)
+### 2. iOS setup
 
-```bash
-dart run entrig:setup ios
-```
+Read and edit the three files directly — see [references/ios-setup.md](references/ios-setup.md) for the exact changes needed. Show the user the diff before saving each file.
 
-Patches `AppDelegate.swift`, `Runner.entitlements`, `Info.plist`. Creates `.backup` files.
+If `Runner.entitlements` doesn't exist, the user must add Push Notifications capability in Xcode first (Xcode creates the file — it can't be done from the command line). See [references/ios-setup.md](references/ios-setup.md).
 
-**Two failure modes** — see [references/ios-setup.md](references/ios-setup.md):
-- `Runner.entitlements` doesn't exist → user must add Push Notifications capability in Xcode first
-- AppDelegate already has custom delegate methods → manual patch needed, see [references/manual-appdelegate.md](references/manual-appdelegate.md)
+**CLI fallback only** — if you cannot parse the AppDelegate structure, fall back to `dart run entrig:setup ios`. See [references/ios-setup.md](references/ios-setup.md) for what it does and its failure modes.
 
 ### 3. Initialize in `main.dart`
 
@@ -154,6 +150,5 @@ After the user adds the MCP server, they must fully restart the agent for the to
 
 - [references/dashboard-setup.md](references/dashboard-setup.md) — account / Supabase / FCM / APNs walkthrough
 - [references/mcp-setup.md](references/mcp-setup.md) — exact instructions when MCP isn't loaded
-- [references/ios-setup.md](references/ios-setup.md) — what `dart run entrig:setup ios` does, when it fails
-- [references/manual-appdelegate.md](references/manual-appdelegate.md) — exact AppDelegate edits when the CLI bails
+- [references/ios-setup.md](references/ios-setup.md) — exact edits for AppDelegate, entitlements, Info.plist; CLI fallback at the bottom
 - [references/common-mistakes.md](references/common-mistakes.md) — extended mistakes with deeper explanations
