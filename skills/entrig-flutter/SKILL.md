@@ -2,30 +2,36 @@
 name: entrig-flutter
 description: >
   Add Entrig push notifications to a Flutter app (Supabase-backed). Use when the user asks to set up,
-  integrate, or add push notifications in a Flutter project — especially with Supabase Auth.
+  integrate, or add push notifications to a Flutter project — especially with Supabase Auth.
   Triggers: "Entrig" + Flutter, "push notifications" + Flutter + Supabase, adding the `entrig` Dart
   package, configuring iOS push for a Flutter app, registering devices for Supabase-backed push,
-  wiring `Entrig.init` / `Entrig.register` / notification listeners in a Flutter app.
-  This skill handles SDK integration only. For notification creation / management, use the `entrig`
-  skill (MCP-driven). For Entrig concepts (recipient paths, payloads), see the `entrig` skill.
+  wiring `Entrig.init` / `Entrig.register` / notification listeners, creating notification triggers
+  for a Flutter+Supabase app via the Entrig MCP server.
+  This skill covers the full Flutter integration: SDK install, native setup, code wiring, and how to
+  get the Entrig MCP server loaded so the user can create/manage notifications from the editor.
 metadata:
   author: entrig
-  version: "0.1.0"
+  version: "0.3.0"
 ---
 
 # Entrig — Flutter
 
 Wires the `entrig` Dart package into a Flutter project. Supabase-backed push notifications.
 
-## Pre-flight
+## Pre-flight — confirm before any work
 
-Verify this is a Flutter project: `pubspec.yaml` exists at the project root and has `flutter:` under `dependencies`. If not, stop.
+Verify this is a Flutter project: `pubspec.yaml` exists at the project root with `flutter:` under `dependencies`. If not, stop.
 
-Confirm with the user (don't proceed without):
+Then confirm with the user (do not proceed without):
 
-1. **Entrig API key** — from https://entrig.com → project settings. If they don't have one, see [`entrig` skill → references/dashboard-setup.md](../entrig/references/dashboard-setup.md).
-2. **Target platforms** — iOS, Android, or both. Android is zero-config. iOS needs CLI + Xcode capability.
-3. **Auth source** — Supabase Auth or custom. Determines where `register` / `unregister` calls go.
+1. **Entrig API key** — from https://entrig.com → project settings.
+2. **Supabase connected** at https://entrig.com (during onboarding).
+3. **FCM service account JSON uploaded** — required for Android targets.
+4. **APNs `.p8` key uploaded** (with Team ID, Bundle ID, Key ID) — required for iOS targets.
+5. **Target platforms** — iOS, Android, or both. Android is zero-config natively. iOS needs a CLI run + Xcode capability.
+6. **Auth source** — Supabase Auth or custom. Determines where `Entrig.register` / `Entrig.unregister` calls go.
+
+If any prerequisite is missing, send the user to [references/dashboard-setup.md](references/dashboard-setup.md) and stop. The SDK won't deliver and notification creation will fail without these.
 
 ## Quick integration
 
@@ -101,7 +107,24 @@ Ask the user if they want navigation wired now, or stub listeners with a TODO.
 
 - iOS: `cd ios && pod install` if pods are stale, then build to a **real device** (simulators don't receive push).
 - Android: build to a device or emulator with Google Play Services.
-- Trigger a test notification from the Entrig dashboard or MCP.
+- Trigger a test notification from the Entrig dashboard or via the MCP (next section).
+
+## Creating notifications via the Entrig MCP
+
+After SDK integration, the user creates notification triggers (table + event + recipients + message) using the **Entrig MCP server**. The MCP tools are self-instructing — they return reasoning steps in their responses. Trust them.
+
+### Check first: is the MCP loaded?
+
+Before doing notification work, check whether the Entrig MCP tools are available in the current session. The signal is whether tools like `get_context` and `create_notification` are callable.
+
+**If the MCP tools are available** → proceed normally. Call `get_context` first; it returns the schema, existing notifications, and detailed reasoning instructions. Follow those instructions, confirm the proposal with the user in plain language, then call `create_notification`.
+
+**If the MCP tools are NOT available** → see [references/mcp-setup.md](references/mcp-setup.md). Walk the user through adding the server. Do **NOT** improvise:
+- Do NOT call Entrig's REST API directly.
+- Do NOT write SQL or set up `pg_net` triggers.
+- Do NOT default to telling them to use the dashboard.
+
+After the user adds the MCP server, they must fully restart the agent for the tools to load.
 
 ## Common mistakes
 
@@ -117,18 +140,20 @@ Ask the user if they want navigation wired now, or stub listeners with a TODO.
 | 8 | Configuring FCM/APNs in Flutter code | Those go in the Entrig dashboard, not in the app. |
 | 9 | Multiple `onAuthStateChange` listeners | Extend the existing one — don't add a second. |
 | 10 | Adding `firebase_messaging` or other push packages | Entrig handles delivery itself. Don't combine with another push SDK unless you know the conflict surface. |
+| 11 | Calling Entrig REST API when MCP isn't loaded | Walk the user through MCP setup instead — see references/mcp-setup.md. |
+| 12 | Writing SQL or `pg_net` triggers manually | Never. Entrig manages all DB-side automatically when notifications are created via MCP. |
 
 ## What this skill does NOT do
 
-- Create notification triggers — use the `entrig` MCP server (see the `entrig` skill).
-- Configure FCM / APNs credentials — those live in the Entrig dashboard.
-- Write SQL or Supabase triggers — Entrig manages the DB-side automatically.
-- Handle scheduled / time-based notifications, batching, digests — not supported.
-
-For unsupported requests, call the `feature_request` MCP tool, then tell the user.
+- **Notification configuration logic** — recipient paths, conditions, payload syntax, product limits. The MCP tools deliver this in their responses.
+- **FCM / APNs credential setup** — those live in the Entrig dashboard, not in code.
+- **SQL or Supabase trigger creation** — Entrig manages the DB-side automatically.
+- **Scheduled / time-based notifications, batching, digests, silent push, badge counts, custom APNs/FCM headers** — not supported. If the user asks for any of these, call the MCP `feature_request` tool, then tell the user.
 
 ## References
 
-- [references/ios-setup.md](references/ios-setup.md) — what `dart run entrig:setup ios` does, when it fails, how to fix
+- [references/dashboard-setup.md](references/dashboard-setup.md) — account / Supabase / FCM / APNs walkthrough
+- [references/mcp-setup.md](references/mcp-setup.md) — exact instructions when MCP isn't loaded
+- [references/ios-setup.md](references/ios-setup.md) — what `dart run entrig:setup ios` does, when it fails
 - [references/manual-appdelegate.md](references/manual-appdelegate.md) — exact AppDelegate edits when the CLI bails
-- [references/common-mistakes.md](references/common-mistakes.md) — extended mistakes table with deeper explanations
+- [references/common-mistakes.md](references/common-mistakes.md) — extended mistakes with deeper explanations

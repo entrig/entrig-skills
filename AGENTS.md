@@ -6,7 +6,9 @@ Guidance for AI coding agents working on this repository.
 
 ## What this repo is
 
-Distribution repo for Entrig agent skills + bundled MCP server. Skills follow the [Agent Skills Open Standard](https://agentskills.io/).
+Distribution repo for Entrig agent skills. Skills follow the [Agent Skills Open Standard](https://agentskills.io/).
+
+This repo ships **skills only**. The Entrig MCP server is configured separately by users — see the README for instructions. We do not bundle a plugin manifest.
 
 ## Repository structure
 
@@ -16,9 +18,6 @@ skills/
     SKILL.md              ← required
     references/           ← progressive-disclosure files
       *.md
-.mcp.json                 ← bundles entrig MCP — installed alongside skills
-.claude-plugin/           ← Claude Code plugin manifest
-.cursor-plugin/           ← Cursor plugin manifest
 ```
 
 ## Writing a SKILL.md
@@ -58,11 +57,22 @@ Keep references narrow and focused. One file per concern.
 
 ## Adding a new SDK skill
 
+Each SDK skill is **self-contained**. It owns the full flow for its framework: pre-flight prerequisite check, SDK install, native setup, code wiring, and pointing the user at the Entrig MCP for notification creation. There is no shared "entrig" skill to defer to.
+
 1. Create `skills/entrig-{framework}/` with `SKILL.md` + `references/`.
 2. Read the SDK's `README.md` and any `bin/` setup scripts in the corresponding `entrig_packages/entrig-{framework}/` to ground the skill in real behavior.
-3. Match the structure of `skills/entrig-flutter/` — quick-start section, integration steps, common-mistakes table, references for platform-specific gotchas.
-4. Keep it under 200 lines in the body.
-5. Add an entry to `README.md` and to `skills/entrig/SKILL.md` (the router).
+3. Match the structure of `skills/entrig-flutter/`:
+   - Pre-flight checklist (account, Supabase, FCM/APNs, API key)
+   - Quick integration steps (install → native setup → init → register → listeners → verify)
+   - "Creating notifications via the Entrig MCP" section with MCP-loaded vs MCP-not-loaded branches
+   - Common mistakes table
+   - "What this skill does NOT do" guardrails
+4. Copy `references/dashboard-setup.md` and `references/mcp-setup.md` from `entrig-flutter/` — these are largely framework-agnostic. Adjust if needed.
+5. Add framework-specific references for native setup, manual fallbacks, and common mistakes.
+6. Keep the body under 200 lines.
+7. Add a row to the top-level `README.md`.
+
+If you find content getting duplicated across 3+ SDK skills with no per-framework variation, consider extracting it to a shared location at that point — but not before. Premature deduplication causes its own problems.
 
 ## What NOT to include in skill folders
 
@@ -79,4 +89,7 @@ Bump `metadata.version` on every change to `SKILL.md` or any file in `references
 
 ## MCP server
 
-The `.mcp.json` at the repo root configures the Entrig MCP server. When installed via `npx skills add`, this is auto-wired. Skills should reference the MCP server by name (`entrig`) when they want the agent to call MCP tools — see `skills/entrig/references/mcp-usage.md`.
+Users configure the Entrig MCP server themselves (see top-level README). The skills should:
+
+- Detect when MCP tools are not available and tell the user how to add the server (instead of improvising via REST API calls or SQL).
+- Reference the MCP tools by name (`get_context`, `create_notification`, etc.) when they're available — see `skills/entrig/references/mcp-usage.md`.
