@@ -11,7 +11,7 @@ description: >
   get the Entrig MCP server loaded so the user can create/manage notifications from the editor.
 metadata:
   author: entrig
-  version: "0.7.4"
+  version: "0.7.5"
 ---
 
 # Entrig — Flutter
@@ -38,14 +38,11 @@ Read what you can from the project first, then only ask the user about what's ge
 
 ### 1. Add dependency
 
-In `pubspec.yaml`:
-
-```yaml
-dependencies:
-  entrig: ^1.0.1
+```bash
+flutter pub add entrig
 ```
 
-Run `flutter pub get`, then read the installed README to confirm current requirements (min iOS/Android versions, prerequisites):
+Then read the installed README to confirm current requirements (min iOS/Android versions, prerequisites):
 
 ```bash
 find ~/.pub-cache/hosted/pub.dev -name "README.md" -path "*/entrig-*/README.md"
@@ -104,7 +101,7 @@ Entrig.onNotificationOpened.listen((event) {
 });
 ```
 
-Ask the user if they want navigation wired now, or stub listeners with a TODO.
+Read the project's existing navigation pattern and wire `onNotificationOpened` consistently. If there is no pattern yet, a recommended approach is a dedicated `PushNotificationService` class with a `switch` on `event.type` — but follow whatever the project already uses.
 
 ### 6. Add the Entrig MCP server
 
