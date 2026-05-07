@@ -11,7 +11,7 @@ description: >
   get the Entrig MCP server loaded so the user can create/manage notifications from the editor.
 metadata:
   author: entrig
-  version: "0.7.1"
+  version: "0.7.4"
 ---
 
 # Entrig — Flutter
@@ -106,23 +106,14 @@ Entrig.onNotificationOpened.listen((event) {
 
 Ask the user if they want navigation wired now, or stub listeners with a TODO.
 
-### 6. Verify
+### 6. Add the Entrig MCP server
+
+Follow [references/mcp-setup.md](references/mcp-setup.md) to add the MCP server to the agent configuration. A full agent restart is required after adding it.
+
+### 7. Verify
 
 - iOS: `cd ios && pod install` if pods are stale, then build to a **real device** (simulators don't receive push).
 - Android: build to a device or emulator with Google Play Services.
-- Trigger a test notification from the Entrig dashboard or via the MCP (next section).
-
-## Creating notifications via the Entrig MCP
-
-After SDK integration, the user creates notification triggers (table + event + recipients + message) using the **Entrig MCP server**. The MCP tools are self-instructing — they return reasoning steps in their responses. Trust them.
-
-### Check first: is the MCP loaded?
-
-Before doing notification work, check whether the Entrig MCP tools are available in the current session. The signal is whether tools like `get_context` and `create_notification` are callable.
-
-**If the MCP tools are available** → proceed normally. Call `get_context` first; it returns the schema, existing notifications, and detailed reasoning instructions. Follow those instructions, confirm the proposal with the user in plain language, then call `create_notification`.
-
-**If the MCP tools are NOT available** → see [references/mcp-setup.md](references/mcp-setup.md) and add the server. A full agent restart is required after adding it.
 
 ## Common mistakes
 
@@ -139,16 +130,10 @@ Before doing notification work, check whether the Entrig MCP tools are available
 | 9 | Multiple `onAuthStateChange` listeners | Extend the existing one — don't add a second. |
 | 10 | Adding `firebase_messaging` or other push packages | Entrig handles delivery itself. Don't combine with another push SDK unless you know the conflict surface. |
 
-## What this skill does NOT do
-
-- **Notification configuration logic** — recipient paths, conditions, payload syntax, product limits. The MCP tools deliver this in their responses.
-- **FCM / APNs credential setup** — those live in the Entrig dashboard, not in code.
-- **SQL or Supabase trigger creation** — Entrig manages the DB-side automatically.
-- **Scheduled / time-based notifications, batching, digests, silent push, badge counts, custom APNs/FCM headers** — not supported. If the user asks for any of these, call the MCP `feature_request` tool, then tell the user.
 
 ## References
 
 - [references/dashboard-setup.md](references/dashboard-setup.md) — account / Supabase / FCM / APNs walkthrough
-- [references/mcp-setup.md](references/mcp-setup.md) — exact instructions when MCP isn't loaded
+- [references/mcp-setup.md](references/mcp-setup.md) — MCP server installation
 - [references/ios-setup.md](references/ios-setup.md) — exact edits for AppDelegate, entitlements, Info.plist; CLI fallback at the bottom
 - [references/common-mistakes.md](references/common-mistakes.md) — extended mistakes with deeper explanations

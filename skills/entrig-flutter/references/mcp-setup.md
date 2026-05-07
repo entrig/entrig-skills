@@ -33,12 +33,7 @@ Use the API key already found in the project. If it hasn't been confirmed yet, a
 
 ## After adding
 
+If the MCP was added to a project-level file (`.mcp.json`), add it to `.gitignore` — it contains the API key.
+
 A full restart of the agent is required — the tool list is fixed at session start. Tell the user to fully quit and relaunch, then ask again to create the notification.
-
-## Verifying after restart
-
-Confirm the Entrig MCP tools (`get_context`, `create_notification`) are callable. If they aren't:
-1. Confirm the API key matches the one in the Entrig dashboard.
-2. Check the server is reachable: `curl -i https://mcp.entrig.com/beta` should return 401.
-3. Try one more clean restart.
 
