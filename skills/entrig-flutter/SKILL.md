@@ -11,7 +11,7 @@ description: >
   get the Entrig MCP server loaded so the user can create/manage notifications from the editor.
 metadata:
   author: entrig
-  version: "0.7.0"
+  version: "0.7.1"
 ---
 
 # Entrig — Flutter
@@ -25,7 +25,7 @@ Before doing any work, understand the project state:
 - Is this a Flutter project? (`pubspec.yaml` with `flutter:` under `dependencies` — if not, stop)
 - What platforms are targeted? (check if `ios/` and `android/` directories exist)
 - How is auth handled? (read `main.dart` and search for sign-in/sign-out patterns)
-- Fetch `https://raw.githubusercontent.com/entrig/entrig-flutter/main/README.md` to check current requirements (min iOS/Android versions, prerequisites) before proceeding.
+- Check current requirements (min iOS/Android versions) — done in Step 1 after `flutter pub get`.
 
 What is needed to proceed:
 - **Entrig API key** — from https://entrig.com → project settings. Having this implies Supabase is already connected.
@@ -45,7 +45,13 @@ dependencies:
   entrig: ^1.0.1
 ```
 
-Run `flutter pub get`.
+Run `flutter pub get`, then read the installed README to confirm current requirements (min iOS/Android versions, prerequisites):
+
+```bash
+find ~/.pub-cache/hosted/pub.dev -name "README.md" -path "*/entrig-*/README.md"
+```
+
+Read the file at the path returned.
 
 ### 2. iOS setup
 
