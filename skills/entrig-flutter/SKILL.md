@@ -11,7 +11,7 @@ description: >
   get the Entrig MCP server loaded so the user can create/manage notifications from the editor.
 metadata:
   author: entrig
-  version: "0.7.6"
+  version: "0.7.7"
 ---
 
 # Entrig — Flutter
@@ -42,15 +42,7 @@ Read what you can from the project first, then only ask the user about what's ge
 flutter pub add entrig
 ```
 
-Then read the installed README to confirm current requirements (min iOS/Android versions, prerequisites):
-
-Get the installed package version from the response and use below
-
-```bash
-find ~/.pub-cache/hosted/pub.dev -name "README.md" -path "*/entrig-*/README.md"
-```
-
-Read the file at the path returned.
+Use the command output to identify the installed latest `entrig` package version.
 
 ### 2. iOS setup
 
@@ -58,7 +50,6 @@ Read and edit the three files directly — see [references/ios-setup.md](referen
 
 If `Runner.entitlements` doesn't exist, the user must add Push Notifications capability in Xcode first (Xcode creates the file — it can't be done from the command line). See [references/ios-setup.md](references/ios-setup.md).
 
-**CLI fallback only** — if you cannot parse the AppDelegate structure, fall back to `dart run entrig:setup ios`. See [references/ios-setup.md](references/ios-setup.md) for what it does and its failure modes.
 
 ### 3. Initialize in `main.dart`
 
