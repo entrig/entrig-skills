@@ -40,37 +40,7 @@ When in doubt, log the `userId` being registered and confirm with the user that 
 
 If the user skips the Xcode step, the iOS build will succeed but APNs registration will fail at runtime — they'll see an error like "no valid 'aps-environment' entitlement string found." See [ios-setup.md](ios-setup.md) for the exact Xcode steps.
 
-## 5. Re-running iOS regeneration wipes setup
-
-Some Flutter operations regenerate native iOS files:
-- `flutter create .` (in an existing project) overwrites `AppDelegate.swift`
-- Switching Flutter versions can sometimes touch native templates
-- Manual cleanup of the `ios/` directory
-
-After any of these, re-run `dart run entrig:setup ios` to restore the patches.
-
-## 6. Forgetting `flutter pub get` after `pubspec.yaml` edit
-
-Flutter doesn't auto-fetch on file save. After editing `pubspec.yaml`:
-
-```bash
-flutter pub get
-```
-
-Skipping this means `import 'package:entrig/entrig.dart';` will fail with "Target of URI doesn't exist."
-
-## 7. Stale build after pod / dep changes
-
-iOS especially is prone to caching native code. When something seems off after a setup change:
-
-```bash
-flutter clean
-flutter pub get
-cd ios && pod install
-flutter run
-```
-
-## 8. Configuring FCM/APNs in Flutter code
+## 5. Configuring FCM/APNs in Flutter code
 
 A common reflex from devs who've used `firebase_messaging` directly: they want to call `FirebaseMessaging.instance.getToken()` or set up `google-services.json` parsing in Dart. **Don't.**
 
@@ -81,17 +51,31 @@ With Entrig:
 
 The user's Flutter code only does `Entrig.init`, `Entrig.register`, and listeners.
 
-## 9. Multiple `onAuthStateChange` listeners
+## 6. Multiple `onAuthStateChange` listeners
 
 If the project already listens to `Supabase.instance.client.auth.onAuthStateChange` for navigation, profile loading, etc., **extend that listener** instead of adding a second one. Two listeners don't conflict, but it splits register/unregister logic across the codebase and makes future debugging harder.
 
-## 10. Mixing Entrig with another push SDK
+## 7. Mixing Entrig with another push SDK
 
 Don't add `firebase_messaging`, `flutter_local_notifications` (for remote push), or another push provider alongside Entrig. They'll fight over:
 - The APNs device token
 - The `UNUserNotificationCenterDelegate`
 - Background notification handling
 
-If the user has an existing push integration and wants to switch to Entrig, remove the old one first.
+If the user has an existing push integration and wants to switch to Entrig, inform the user.
 
 `flutter_local_notifications` for **local** (in-app scheduled) notifications is fine alongside Entrig — they don't overlap.
+
+## 8. Creating notifications without updating tap routing
+
+Creating a notification trigger only configures delivery. It does not automatically teach the app what to do when the user taps the push notification.
+
+After `create_notification` or `update_notification` succeeds, read the MCP response:
+- `notification_tap_contract.type`
+- `notification_tap_contract.payload`
+
+Then update the Flutter app's existing `Entrig.onNotificationOpened.listen(...)` handler to route by `event.type` and use the payload fields from `event.data`.
+
+After `delete_notification` succeeds, remove stale routing for `deleted_notification_tap_contract.type` if no remaining notification uses that type.
+
+Do not add a second global notification-opened listener. Extend the existing handler or central push notification service.

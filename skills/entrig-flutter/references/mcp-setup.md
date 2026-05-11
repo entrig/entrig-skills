@@ -1,21 +1,31 @@
-# Adding the Entrig MCP server
+# Entrig MCP server
 
-Read when the Entrig MCP tools (`get_context`, `create_notification`, etc.) are not available and the user wants to create or manage notifications.
+Use this guide to set up the Entrig MCP server so the coding agent can create and manage notifications.
 
-## What needs to happen
+## Setup
 
-The Entrig MCP server must be added to the agent's MCP configuration. Here are the connection details:
+MCP setup is client-specific. Do not assume every agent uses `.mcp.json`.
 
+Use these Entrig connection values in whatever MCP setup flow the user's client supports:
+
+- Server name: `entrig`
+- Transport/type: HTTP / Streamable HTTP
+- Server URL: `https://mcp.entrig.com/beta`
+- Authentication: bearer token / API key
+- Header: `Authorization: Bearer <entrig_api_key>`
+
+If the client supports a command-line setup, use that. If it supports a UI connector flow, use the UI. If it uses a JSON config file, add the Entrig server to the existing config without removing other servers.
+
+### Claude Code
+
+```bash
+claude mcp add --transport http entrig https://mcp.entrig.com/beta \
+  --header "Authorization: Bearer YOUR_ENTRIG_API_KEY"
 ```
-transport: http
-url: https://mcp.entrig.com/beta
-headers:
-  Authorization: Bearer <entrig_api_key>
-```
 
-Use the API key already found in the project. If it hasn't been confirmed yet, ask for it once.
+### JSON-based MCP clients
 
-## mcp.json / .mcp.json format
+Add this to the client's MCP config file. The exact file path varies by client; use the client's docs or existing project config.
 
 ```json
 {
@@ -31,9 +41,9 @@ Use the API key already found in the project. If it hasn't been confirmed yet, a
 }
 ```
 
+
 ## After adding
 
-If the MCP was added to a project-level file (`.mcp.json`), add it to `.gitignore` — it contains the API key.
+If the MCP config is project-level, ensure that exact config file is in `.gitignore` because it contains the API key. Do not commit API keys.
 
-A full restart of the agent is required — the tool list is fixed at session start. Tell the user to fully quit and relaunch, then ask again to create the notification.
-
+A full restart of the agent is required because the tool list is fixed at session start. Tell the user to fully quit and relaunch, then ask again to create or manage the notification.

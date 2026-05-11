@@ -1,8 +1,8 @@
-# Dashboard prerequisites
+# Dashboard setup
 
 Read when the user hasn't yet completed Entrig account / Supabase / FCM / APNs setup. These steps happen **outside the codebase** at https://entrig.com.
 
-## What the user must do (in order)
+## What the user should complete
 
 ### 1. Create an Entrig account
 
@@ -10,7 +10,7 @@ Sign up at https://entrig.com.
 
 ### 2. Connect Supabase
 
-In onboarding, click "Connect Supabase," sign in to Supabase, authorize Entrig, and select the project. Entrig provisions DB triggers and `pg_net` automatically — no manual SQL.
+In onboarding, click "Connect Supabase," sign in to Supabase, authorize Entrig, and select the project.
 
 ### 3. Upload FCM service account JSON (Android targets)
 
@@ -37,16 +37,12 @@ Required if the app ships on iOS and FCM is not handling iOS delivery.
 7. Upload `.p8` + Team ID + Bundle ID + Key ID to the Entrig dashboard
 8. Configure for **Production**, **Sandbox**, or both — Sandbox for Xcode debug builds, Production for App Store / TestFlight
 
-### 5. Copy the API key
+### 3. Copy the API key
 
 Dashboard → project settings → copy the API Key. This is what `Entrig.init(apiKey: ...)` and the MCP server need.
 
-## How to verify before continuing
+## When to use this guide
 
-Ask the user:
+Use this guide when the user wants help completing dashboard setup for push delivery.
 
-- "Do you have your Entrig API key handy?"
-- "Have you uploaded FCM JSON?" (if Android)
-- "Have you uploaded the APNs `.p8`?" (if iOS)
-
-If anything is missing, **stop**. Sending them to write code or call the MCP without these credentials wastes their time — the SDK won't deliver and notification creation will fail at runtime.
+For SDK integration, the API key is enough to initialize Entrig. FCM/APNs configuration is needed to send push notifications.
