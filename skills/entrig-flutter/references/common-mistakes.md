@@ -45,7 +45,7 @@ If the user skips the Xcode step, the iOS build will succeed but APNs registrati
 A common reflex from devs who've used `firebase_messaging` directly: they want to call `FirebaseMessaging.instance.getToken()` or set up `google-services.json` parsing in Dart. **Don't.**
 
 With Entrig:
-- FCM service account JSON is uploaded to the Entrig dashboard (NOT placed in `android/app/`).
+- No `google-services.json` or Firebase init code is needed in the app. The FCM service account JSON is uploaded to the Entrig dashboard.
 - APNs `.p8` is uploaded to the Entrig dashboard.
 - The SDK handles token acquisition internally and reports to Entrig's backend.
 
@@ -55,16 +55,11 @@ The user's Flutter code only does `Entrig.init`, `Entrig.register`, and listener
 
 If the project already listens to `Supabase.instance.client.auth.onAuthStateChange` for navigation, profile loading, etc., **extend that listener** instead of adding a second one. Two listeners don't conflict, but it splits register/unregister logic across the codebase and makes future debugging harder.
 
-## 7. Mixing Entrig with another push SDK
+## 7. Another push SDK already installed
 
-Don't add `firebase_messaging`, `flutter_local_notifications` (for remote push), or another push provider alongside Entrig. They'll fight over:
-- The APNs device token
-- The `UNUserNotificationCenterDelegate`
-- Background notification handling
+Entrig's iOS setup is designed not to conflict — it adds delegate methods without replacing other SDKs' hooks. If another push SDK is already present (e.g. `firebase_messaging`), check whether it also sets `UNUserNotificationCenter.current().delegate`. If both set it, only one will receive `willPresent`/`didReceive` callbacks — whichever sets it last wins. Warn the user and check the other SDK's docs.
 
-If the user has an existing push integration and wants to switch to Entrig, inform the user.
-
-`flutter_local_notifications` for **local** (in-app scheduled) notifications is fine alongside Entrig — they don't overlap.
+`flutter_local_notifications` for local (in-app scheduled) notifications does not conflict — it doesn't touch remote push delegates.
 
 ## 8. Creating notifications without updating tap routing
 

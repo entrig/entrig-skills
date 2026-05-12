@@ -71,12 +71,11 @@ Add inside the root `<dict>` if not present:
 ```xml
 <key>UIBackgroundModes</key>
 <array>
-  <string>fetch</string>
   <string>remote-notification</string>
 </array>
 ```
 
-If `UIBackgroundModes` already exists, add the two strings to the existing array if missing.
+If `UIBackgroundModes` already exists, add `remote-notification` to the existing array if missing. Leave any other existing entries (e.g. `fetch`, `audio`) alone — they belong to the app, not to Entrig. Note that the default `flutter create` Info.plist may already include `fetch` — that's Flutter template boilerplate, not an Entrig requirement.
 
 ## After editing
 
@@ -97,6 +96,3 @@ pod install
 
 Build cache issues: `flutter clean && flutter pub get && cd ios && pod install`.
 
-## CLI fallback
-
-Only use `dart run entrig:setup ios` if you cannot parse the AppDelegate structure. The CLI assumes an unmodified AppDelegate — if delegate methods already exist it bails without making any changes.

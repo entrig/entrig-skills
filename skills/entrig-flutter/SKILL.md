@@ -5,13 +5,13 @@ description: >
   integrate, or add push notifications to a Flutter project — especially with Supabase Auth.
   Triggers: "Entrig" + Flutter, "push notifications" + Flutter + Supabase, adding the `entrig` Dart
   package, configuring iOS push for a Flutter app, registering devices for Supabase-backed push,
-  wiring `Entrig.init` / `Entrig.register` / notification listeners, creating notification triggers
-  for a Flutter+Supabase app via the Entrig MCP server.
-  This skill covers the full Flutter integration: SDK install, native setup, code wiring, and how to
-  get the Entrig MCP server loaded so the user can create/manage notifications from the editor.
+  wiring `Entrig.init` / `Entrig.register` / notification listeners, and implementing app-side
+  notification tap handling for Entrig notification types created via MCP.
+  This skill covers Flutter SDK integration: package install, native setup, code wiring, and
+  framework-specific tap handling. Use entrig-mcp for MCP setup and notification CRUD.
 metadata:
   author: entrig
-  version: "0.7.7"
+  version: "1.0.0"
 ---
 
 # Entrig — Flutter
@@ -20,19 +20,13 @@ Wires the `entrig` Dart package into a Flutter project. Push notifications based
 
 ## Pre-flight
 
-Before doing any work, understand the project state:
+Read the project first:
 
 - Is this a Flutter project? (`pubspec.yaml` with `flutter:` under `dependencies` — if not, stop)
 - What platforms are targeted? (check if `ios/` and `android/` directories exist)
 - How is auth handled? (read `main.dart` and search for sign-in/sign-out patterns)
-- Check current requirements (min iOS/Android versions) — done in Step 1 after `flutter pub get`.
 
-What is needed for SDK setup:
-- **Entrig API key** — from https://app.entrig.com → project settings. This is required for `Entrig.init(...)` and implies Supabase is already connected.
-
-FCM/APNs configuration is needed to send push notifications. Ensure the required push provider configuration is completed in the Entrig dashboard before sending notifications.
-
-Read what you can from the project first, then only ask the user about what's genuinely unclear or missing. If the Entrig API key is missing, ask the user to copy it from the Entrig dashboard project settings.
+Only ask the user about what's genuinely unclear or missing. If the Entrig API key is missing, ask them to copy it from https://app.entrig.com → project settings.
 
 ## Quick integration
 
@@ -63,17 +57,22 @@ await Entrig.init(apiKey: const String.fromEnvironment('ENTRIG_API_KEY'));
 
 **Never hardcode the key.** If the project uses `flutter_dotenv`, read from `.env` (and add to `.gitignore`). Otherwise use `--dart-define=ENTRIG_API_KEY=...` or follow the project's existing secret pattern.
 
+`Entrig.init` accepts two optional flags:
+
+- `handlePermission` (default `true`) — when `true`, `Entrig.register(...)` automatically prompts for notification permission. Set to `false` only if the app already manages permissions itself; then call `Entrig.requestPermission()` before `Entrig.register(...)`.
+- `showForegroundNotification` (default `false`) — when `true`, the system notification banner is shown while the app is in the foreground. When `false`, the banner is suppressed.
+
 ### 4. Register the device
 
-Call `Entrig.register(userId: ...)` when the app has the identifier it will use for notification targeting. This can be a signed-in user ID, anonymous/device-scoped ID, or another stable identifier. The same identifier must be stored in the database so Entrig can find it from the table row/event that triggers the notification.
-
-**Example:**
+Call `Entrig.register(userId: ...)` with the identifier Entrig will use to look up this user from the event table when a notification is triggered. The value must match the user identifier field configured in the notification trigger.
 
 ```dart
 await Entrig.register(userId: identifier);
 ```
 
-Follow the project's existing auth/session/state pattern. Call `Entrig.unregister()` when the app should stop receiving notifications for the previously registered identifier.
+`register` also accepts an optional `isDebug` flag — the SDK resolves this automatically, don't set it unless there's a specific need. When `true`, the device appears under **Test push notifications** in the Entrig web dashboard.
+
+Follow the project's existing auth/session/state pattern. Call `Entrig.unregister()` when the app should stop receiving notifications for that identifier.
 
 ### 5. Listeners
 
@@ -93,24 +92,11 @@ When notification triggers are created or updated via the Entrig MCP, the MCP re
 
 When a notification is deleted via the MCP, remove stale `onNotificationOpened` routing for the deleted type if no remaining notification uses that type.
 
-### 6. Creating notifications via the Entrig MCP
+### 6. Notification triggers
 
-After SDK integration, create and manage notification triggers using the Entrig MCP server. The MCP tools return reasoning steps and post-action instructions — follow them.
+Use the `entrig-mcp` skill to set up the MCP server and create, update, list, inspect, or delete notification triggers.
 
-Before doing notification work, check whether tools like `get_context` and `create_notification` are callable in the current session.
-
-**If the MCP tools are available** → call `get_context` first; it returns schema + existing notifications + reasoning instructions. Follow those, confirm the proposal in plain language, then call `create_notification`, `update_notification`, or `delete_notification`.
-
-After `create_notification` or `update_notification` succeeds:
-- Read `notification_tap_contract.type` and `notification_tap_contract.payload` from the MCP response.
-- Update the Flutter app's existing `Entrig.onNotificationOpened.listen(...)` handler to route by that `type` using the returned payload fields.
-- Follow the project's navigation pattern. If no pattern exists, use a dedicated service with a `switch` on `event.type`.
-
-After `delete_notification` succeeds:
-- Read `deleted_notification_tap_contract.type` if present.
-- Remove stale tap routing for that type only if no remaining notification uses it.
-
-**If the MCP tools are NOT available** → follow [references/mcp-setup.md](references/mcp-setup.md). A full agent restart is required after adding it. Do **not** call Entrig's REST API directly, write SQL, or set up `pg_net` triggers manually.
+When the MCP returns `notification_tap_contract`, update Flutter's existing `Entrig.onNotificationOpened.listen(...)` handler as described above. When the MCP returns `deleted_notification_tap_contract`, remove stale routing only if no remaining notification uses that type.
 
 ### 7. Verify
 
@@ -123,20 +109,16 @@ After `delete_notification` succeeds:
 |---|---|---|
 | 1 | Testing iOS push on a simulator | Real device only — simulators won't receive. |
 | 2 | Hardcoding the API key | Use `--dart-define`, `flutter_dotenv`, or the project's secret pattern. |
-| 3 | `userId` mismatch with notification trigger | The userId in `Entrig.register()` must match the user identifier field in the dashboard. With Supabase Auth, that's `auth.users.id`. |
+| 3 | `userId` mismatch with notification trigger | The value passed to `Entrig.register()` must match the user identifier field configured in the notification trigger. |
 | 4 | Skipping `Runner.entitlements` Xcode step | If file doesn't exist, the CLI bails. User must add Push Notifications capability in Xcode first. |
-| 5 | Re-running `flutter create` or pod regen wipes iOS setup | Re-run `dart run entrig:setup ios` after any iOS regeneration. |
-| 6 | Forgetting `flutter pub get` after `pubspec.yaml` edit | Always run after dep changes. |
-| 7 | Stale build after pod/dep changes | `flutter clean` then `flutter run` if behavior is flaky. |
-| 8 | Configuring FCM/APNs in Flutter code | Those go in the Entrig dashboard, not in the app. |
-| 9 | Multiple `onAuthStateChange` listeners | Extend the existing one — don't add a second. |
-| 10 | Adding `firebase_messaging` or other push packages | Entrig handles delivery itself. Don't combine with another push SDK unless you know the conflict surface. |
-| 11 | Creating a notification but not updating tap routing | After MCP create/update, update `Entrig.onNotificationOpened` using `notification_tap_contract.type` and payload. After delete, remove stale routing if unused. |
+| 5 | Adding the package manually | Use `flutter pub add entrig`. |
+| 6 | Stale build after pod/dep changes | `flutter clean` then `flutter run` if behavior is flaky. |
+| 7 | Configuring FCM/APNs in Flutter code | Those go in the Entrig dashboard, not in the app. |
+| 8 | Multiple `onAuthStateChange` listeners | Extend the existing one — don't add a second. |
+| 9 | Creating a notification but not updating tap routing | After MCP create/update, update `Entrig.onNotificationOpened` using `notification_tap_contract.type` and payload. After delete, remove stale routing if unused. |
 
 
 ## References
 
-- [references/dashboard-setup.md](references/dashboard-setup.md) — account / Supabase / FCM / APNs walkthrough
-- [references/mcp-setup.md](references/mcp-setup.md) — MCP server installation
-- [references/ios-setup.md](references/ios-setup.md) — exact edits for AppDelegate, entitlements, Info.plist; CLI fallback at the bottom
+- [references/ios-setup.md](references/ios-setup.md) — exact direct edits for AppDelegate, entitlements, and Info.plist
 - [references/common-mistakes.md](references/common-mistakes.md) — extended mistakes with deeper explanations

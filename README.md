@@ -4,7 +4,7 @@ Agent skills for [Entrig](https://entrig.com) — push notifications for Supabas
 
 After installing, your AI coding agent (Claude Code, Cursor, etc.) can:
 
-- **Integrate the Entrig SDK** into your app (Flutter — more SDKs coming)
+- **Integrate the Entrig SDK** into your app
 - **Create and manage notifications** in natural language using the Entrig MCP server
 - Avoid the common gotchas: simulator push, AppDelegate quirks, FCM/APNs uploads, recipient path modeling
 
@@ -18,52 +18,24 @@ That installs the skill files into your project's `.claude/skills/` (or the equi
 
 ## Add the Entrig MCP server
 
-Skills handle SDK integration. The **MCP server** is what lets your agent create, list, and update notifications. Add it to your agent's MCP config.
+SDK skills handle app integration. The **`entrig-mcp` skill** handles client-specific MCP setup and notification CRUD workflow.
 
-### Claude Code
+Use the `entrig-mcp` skill when you need to connect the MCP server or create, update, list, inspect, or delete notification triggers.
 
-Add the Entrig MCP server with one command:
-
-```bash
-claude mcp add --transport http entrig https://mcp.entrig.com/beta \
-  --header "Authorization: Bearer YOUR_ENTRIG_API_KEY"
-```
-
-Replace `YOUR_ENTRIG_API_KEY` with your key from [entrig.com](https://entrig.com) → project settings.
-
-Then restart Claude Code and confirm with `/mcp` — `entrig` should appear as connected.
-
-### Cursor / other agents
-
-Add to your `.mcp.json` (or your agent's equivalent MCP config):
-
-```json
-{
-  "mcpServers": {
-    "entrig": {
-      "type": "http",
-      "url": "https://mcp.entrig.com/beta",
-      "headers": {
-        "Authorization": "Bearer YOUR_ENTRIG_API_KEY"
-      }
-    }
-  }
-}
-```
-
-Restart your agent to load the server.
+Core values: URL `https://mcp.entrig.com/beta`, HTTP / Streamable HTTP transport, bearer/API key auth.
 
 ## Available skills
 
 | Skill | What it does |
 |---|---|
-| [`entrig-flutter`](./skills/entrig-flutter) | Add the `entrig` Dart package to a Flutter project — install, native setup, code wiring, and using the Entrig MCP for notifications |
-| [`entrig-react-native`](./skills/entrig-react-native) | Add `@entrig/react-native` to a **bare** React Native project — setup CLI, pod install, code wiring, MCP usage |
-| [`entrig-expo`](./skills/entrig-expo) | Add `@entrig/react-native` to an **Expo** (managed/prebuild) project — config plugin, bundle ID, Apple Developer Portal, code wiring, MCP usage |
+| [`entrig-mcp`](./skills/entrig-mcp) | Set up the Entrig MCP server and create, update, list, inspect, or delete notification triggers |
+| [`entrig-flutter`](./skills/entrig-flutter) | Add the `entrig` Dart package to a Flutter project — install, native setup, code wiring, and tap handling |
+| [`entrig-react-native`](./skills/entrig-react-native) | Add `@entrig/react-native` to a **bare** React Native project — setup CLI, pod install, code wiring, and tap handling |
+| [`entrig-expo`](./skills/entrig-expo) | Add `@entrig/react-native` to an **Expo** (managed/prebuild) project — config plugin, bundle ID, Apple Developer Portal, code wiring, and tap handling |
 
 More SDKs coming: iOS native, Android native, Capacitor.
 
-Each SDK skill is self-contained — it covers its own framework's integration plus how to use the Entrig MCP server to create and manage notifications.
+Each SDK skill covers its framework integration. The `entrig-mcp` skill covers MCP setup and notification management.
 
 ## Prerequisites
 
