@@ -11,7 +11,7 @@ description: >
   framework-specific tap handling. Use entrig-mcp for MCP setup and notification CRUD.
 metadata:
   author: entrig
-  version: "1.0.0"
+  version: "1.0.1"
 ---
 
 # Entrig — Capacitor
@@ -24,6 +24,7 @@ Read the project first:
 
 - Is this a Capacitor project? (`capacitor.config.ts` or `capacitor.config.json` — if not, stop)
 - What platforms are added? (check if `ios/` and `android/` directories exist via `npx cap ls`)
+- Do platform targets meet minimum requirements? (iOS 14.0+, Android API 24+; stop and inform the user if not)
 - How is auth handled? (search for sign-in/sign-out patterns and Supabase auth usage)
 
 Only ask the user about what's genuinely unclear or missing. If the Entrig API key is missing, ask them to copy it from https://app.entrig.com → project settings.

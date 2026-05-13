@@ -11,7 +11,7 @@ description: >
   permission handling. Use entrig-mcp for MCP setup and notification CRUD.
 metadata:
   author: entrig
-  version: "1.0.0"
+  version: "1.0.1"
 ---
 
 # Entrig — Native Android
@@ -23,7 +23,7 @@ Wires the `com.entrig:entrig` library into a native Android project. Push notifi
 Read the project first:
 
 - Is this a native Android project? (`build.gradle` or `build.gradle.kts` with `com.android.application` — if not, stop)
-- What is the minimum SDK version? (must be API 24+)
+- Does the project meet minimum requirements? (Android API 24 / Android 7.0+; stop and inform the user if not)
 - How is auth handled? (search for sign-in/sign-out patterns and Supabase auth usage)
 - Does the project already have a custom `Application` class? (check `AndroidManifest.xml` for `android:name`)
 

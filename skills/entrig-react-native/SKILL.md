@@ -11,7 +11,7 @@ description: >
   For Expo (managed workflow) projects, use the `entrig-expo` skill instead.
 metadata:
   author: entrig
-  version: "0.3.0"
+  version: "1.0.1"
 ---
 
 # Entrig — React Native
@@ -25,6 +25,7 @@ Read the project first:
 - Is this a React Native project? (`package.json` has `react-native` in `dependencies`, `ios/` directory exists at the root — if not, stop)
 - Is it actually a managed Expo project? (`app.json` with an `expo` key and no checked-in `ios/` directory) — if so, stop and route the user to the `entrig-expo` skill.
 - What platforms are targeted? (check if `ios/` and `android/` directories exist)
+- Do platform targets meet minimum requirements? (iOS 14.0+, Android API 24+; stop and inform the user if not)
 - How is auth handled? (read `App.tsx` or `App.js` and search for sign-in/sign-out patterns)
 
 Only ask the user about what's genuinely unclear or missing. If the Entrig API key is missing, ask them to copy it from https://app.entrig.com → project settings.

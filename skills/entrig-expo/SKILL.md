@@ -11,7 +11,7 @@ description: >
   This skill is for Expo (managed/prebuild) ONLY. For bare React Native projects, use entrig-react-native.
 metadata:
   author: entrig
-  version: "1.0.0"
+  version: "1.0.1"
 ---
 
 # Entrig — Expo
@@ -25,6 +25,7 @@ Read the project first:
 - Is this an Expo project? (`package.json` has `expo` in `dependencies`, `app.json` or `app.config.js` has an `expo` block — if not, stop)
 - Is it actually a bare React Native project? (`ios/` directory committed to source control, no `expo` block) — if so, stop and route the user to the `entrig-react-native` skill.
 - What platforms are targeted? (check if `ios/` and `android/` directories exist, or what `app.json` targets)
+- Do platform targets meet minimum requirements? (iOS 14.0+, Android API 24+; stop and inform the user if not)
 - How is auth handled? (read `App.tsx` or `App.js` and search for sign-in/sign-out patterns)
 
 Only ask the user about what's genuinely unclear or missing. If the Entrig API key is missing, ask them to copy it from https://app.entrig.com → project settings.

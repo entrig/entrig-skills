@@ -12,7 +12,7 @@ description: >
   notification CRUD.
 metadata:
   author: entrig
-  version: "1.0.0"
+  version: "1.0.1"
 ---
 
 # Entrig — Native iOS
@@ -24,6 +24,7 @@ Wires the `Entrig` Swift package into a native iOS project. Push notifications b
 Read the project first:
 
 - Is this a native iOS project? (`*.xcodeproj` or `*.xcworkspace` with Swift/Objective-C — if not, stop)
+- Does the project meet minimum requirements? (iOS 14.0+, Xcode 13+, Swift 5.5+; stop and inform the user if not)
 - Does the project use SwiftUI (`@main` App struct) or UIKit (`AppDelegate`)? (determines where `configure` goes)
 - How is auth handled? (search for sign-in/sign-out patterns and Supabase auth usage)
 - Does `AppDelegate` already exist? (SwiftUI apps may not have one)

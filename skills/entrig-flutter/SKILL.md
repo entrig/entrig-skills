@@ -11,7 +11,7 @@ description: >
   framework-specific tap handling. Use entrig-mcp for MCP setup and notification CRUD.
 metadata:
   author: entrig
-  version: "1.0.0"
+  version: "1.0.1"
 ---
 
 # Entrig — Flutter
@@ -24,6 +24,7 @@ Read the project first:
 
 - Is this a Flutter project? (`pubspec.yaml` with `flutter:` under `dependencies` — if not, stop)
 - What platforms are targeted? (check if `ios/` and `android/` directories exist)
+- Do platform targets meet minimum requirements? (iOS 14.0+, Android API 24+; stop and inform the user if not)
 - How is auth handled? (read `main.dart` and search for sign-in/sign-out patterns)
 
 Only ask the user about what's genuinely unclear or missing. If the Entrig API key is missing, ask them to copy it from https://app.entrig.com → project settings.
