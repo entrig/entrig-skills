@@ -11,7 +11,7 @@ description: >
   This skill is for Expo (managed/prebuild) ONLY. For bare React Native projects, use entrig-react-native.
 metadata:
   author: entrig
-  version: "1.0.1"
+  version: "1.0.3"
 ---
 
 # Entrig — Expo
@@ -183,7 +183,7 @@ if (initial) {
 
 Read the project's existing navigation pattern and wire `opened` and cold-start handling consistently. If there is no pattern yet, a `switch` on `event.type` is recommended — but follow whatever the project already uses.
 
-When notification triggers are created or updated via the Entrig MCP, the MCP response includes `notification_tap_contract` with the notification `type` and `payload`. Immediately update the existing opened/cold-start handlers so tapping that notification opens the correct screen. Do not create a second global listener if one already exists.
+When notification triggers are created or updated via the Entrig MCP, the MCP response includes `notification_tap_contract` with the notification `type` and `data_shape` (the exact `event.data` object the SDK delivers). Immediately update the existing opened/cold-start handlers so tapping that notification opens the correct screen. Do not create a second global listener if one already exists.
 
 When a notification is deleted via the MCP, remove stale opened/cold-start routing for the deleted type if no remaining notification uses that type.
 
@@ -215,7 +215,7 @@ When the MCP returns `notification_tap_contract`, update the app's existing `use
 | 11 | Adding another remote-push SDK alongside Entrig | Don't combine `expo-notifications` (for remote), `@react-native-firebase/messaging`, etc. with Entrig — they fight over the APNs token and delegate. Local notifications via `expo-notifications` are fine. |
 | 12 | Calling Entrig REST API when MCP isn't loaded | Use the `entrig-mcp` skill to set up MCP instead. |
 | 13 | Writing SQL or `pg_net` triggers manually | Never. Entrig manages all DB-side automatically when notifications are created via MCP. |
-| 14 | Creating a notification but not updating tap routing | After MCP create/update, update opened/cold-start handlers using `notification_tap_contract.type` and payload. After delete, remove stale routing if unused. |
+| 14 | Creating a notification but not updating tap routing | After MCP create/update, update opened/cold-start handlers using `notification_tap_contract.type` and `data_shape`. After delete, remove stale routing if unused. |
 
 ## References
 

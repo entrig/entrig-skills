@@ -91,9 +91,9 @@ Creating a notification trigger only configures delivery. It does not teach the 
 
 After `create_notification` or `update_notification` succeeds via MCP, read the response:
 - `notification_tap_contract.type`
-- `notification_tap_contract.payload`
+- `notification_tap_contract.data_shape` — the exact object the SDK delivers as `event.data`
 
-Then update the app's existing `onNotificationOpened` listener to handle that type and navigate using the payload fields from `event.data`.
+Then update the app's existing `onNotificationOpened` listener to handle that type and navigate using the fields from `event.data`, shaped as in `data_shape`.
 
 After `delete_notification`, remove stale routing for `deleted_notification_tap_contract.type` if no remaining notification uses that type.
 

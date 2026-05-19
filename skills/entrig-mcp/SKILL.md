@@ -8,7 +8,7 @@ description: >
   Claude Code, Cursor, Lovable, or another MCP-compatible client.
 metadata:
   author: entrig
-  version: "0.1.1"
+  version: "1.0.0"
 ---
 
 # Entrig MCP
@@ -37,8 +37,8 @@ When managing existing notifications:
 ## Tap Handler Contract
 
 After `create_notification` or `update_notification` succeeds, the MCP response includes `notification_tap_contract` with:
-- `type`
-- `payload`
+- `type` — the notification type string for routing
+- `data_shape` — the exact object the SDK delivers as `event.data`, with keys and nesting matching what the app will receive at runtime
 
 Tell the active SDK skill or coding agent to update the app-side notification tap/open handler using that contract. This is framework-specific:
 - Flutter: update `Entrig.onNotificationOpened.listen(...)`.

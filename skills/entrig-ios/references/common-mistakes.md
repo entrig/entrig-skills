@@ -83,9 +83,9 @@ Creating a notification trigger only configures when and to whom push notificati
 
 After `create_notification` or `update_notification` succeeds via MCP, read the response:
 - `notification_tap_contract.type`
-- `notification_tap_contract.payload`
+- `notification_tap_contract.data_shape` — the exact object the SDK delivers as `notification.data`
 
-Then update the app's existing `onNotificationClick` handler to add a `case` for that type and use the payload fields from `notification.data`.
+Then update the app's existing `onNotificationClick` handler to add a `case` for that type and access fields from `notification.data` using the shape in `data_shape`.
 
 After `delete_notification`, remove the stale `case` from the `switch` if no remaining notification uses that type.
 

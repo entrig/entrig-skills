@@ -11,7 +11,7 @@ description: >
   permission handling. Use entrig-mcp for MCP setup and notification CRUD.
 metadata:
   author: entrig
-  version: "1.0.1"
+  version: "1.0.2"
 ---
 
 # Entrig — Native Android
@@ -170,7 +170,7 @@ if (initial != null) {
 }
 ```
 
-When notification triggers are created or updated via the Entrig MCP, the MCP response includes `notification_tap_contract` with the notification `type` and `payload`. Immediately update the existing `setOnNotificationOpenedListener` handler so tapping that notification opens the correct screen. Do not set a second listener if one already exists — update the existing `when` block.
+When notification triggers are created or updated via the Entrig MCP, the MCP response includes `notification_tap_contract` with the notification `type` and `data_shape` (the exact `notification.data` object the SDK delivers). Immediately update the existing `setOnNotificationOpenedListener` handler so tapping that notification opens the correct screen. Do not set a second listener if one already exists — update the existing `when` block.
 
 When a notification is deleted via the MCP, remove stale routing for the deleted type from the listener if no remaining notification uses that type.
 
@@ -227,7 +227,7 @@ When the MCP returns `notification_tap_contract`, update the existing `setOnNoti
 | 6 | Setting multiple `onNotificationOpenedListener`s | Only one listener is active at a time — the last one set wins. Use a single `when` block and extend it. |
 | 7 | Not calling `unregister()` before sign-out | The device keeps receiving notifications for the previous user after sign-out. |
 | 8 | Testing on an emulator without Google Play Services | FCM requires Google Play Services. Use an emulator image that includes them, or a real device. |
-| 9 | Creating a notification but not updating tap routing | After MCP create/update, update the `setOnNotificationOpenedListener` handler using `notification_tap_contract.type` and payload. After delete, remove stale routing if unused. |
+| 9 | Creating a notification but not updating tap routing | After MCP create/update, update the `setOnNotificationOpenedListener` handler using `notification_tap_contract.type` and `data_shape`. After delete, remove stale routing if unused. |
 | 10 | Missing minimum SDK version | The SDK requires API 24 (Android 7.0). Builds targeting lower will fail at runtime. |
 
 ## References

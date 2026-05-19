@@ -11,7 +11,7 @@ description: >
   framework-specific tap handling. Use entrig-mcp for MCP setup and notification CRUD.
 metadata:
   author: entrig
-  version: "1.0.1"
+  version: "1.0.2"
 ---
 
 # Entrig — Flutter
@@ -89,7 +89,7 @@ Entrig.onNotificationOpened.listen((event) {
 
 Read the project's existing navigation pattern and wire `onNotificationOpened` consistently. If there is no pattern yet, a recommended approach is a dedicated `PushNotificationService` class with a `switch` on `event.type` — but follow whatever the project already uses.
 
-When notification triggers are created or updated via the Entrig MCP, the MCP response includes `notification_tap_contract` with the notification `type` and `payload`. Immediately update the existing `onNotificationOpened` handler so tapping that notification opens the correct screen. Do not create a second global listener if one already exists.
+When notification triggers are created or updated via the Entrig MCP, the MCP response includes `notification_tap_contract` with the notification `type` and `data_shape` (the exact `event.data` object the SDK delivers). Immediately update the existing `onNotificationOpened` handler so tapping that notification opens the correct screen. Do not create a second global listener if one already exists.
 
 When a notification is deleted via the MCP, remove stale `onNotificationOpened` routing for the deleted type if no remaining notification uses that type.
 
@@ -116,7 +116,7 @@ When the MCP returns `notification_tap_contract`, update Flutter's existing `Ent
 | 6 | Stale build after pod/dep changes | `flutter clean` then `flutter run` if behavior is flaky. |
 | 7 | Configuring FCM/APNs in Flutter code | Those go in the Entrig dashboard, not in the app. |
 | 8 | Multiple `onAuthStateChange` listeners | Extend the existing one — don't add a second. |
-| 9 | Creating a notification but not updating tap routing | After MCP create/update, update `Entrig.onNotificationOpened` using `notification_tap_contract.type` and payload. After delete, remove stale routing if unused. |
+| 9 | Creating a notification but not updating tap routing | After MCP create/update, update `Entrig.onNotificationOpened` using `notification_tap_contract.type` and `data_shape`. After delete, remove stale routing if unused. |
 
 
 ## References

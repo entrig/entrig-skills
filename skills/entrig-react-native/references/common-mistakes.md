@@ -79,8 +79,8 @@ Creating a notification trigger only configures delivery — it doesn't teach th
 
 After `create_notification` or `update_notification`, read the MCP response:
 - `notification_tap_contract.type`
-- `notification_tap_contract.payload`
+- `notification_tap_contract.data_shape` — the exact object the SDK delivers as `event.data`
 
-Update the existing `useEntrigEvent('opened', ...)` handler and cold-start handling to route by `event.type` and use the payload fields from `event.data`. Do not add a second global listener — extend the existing one.
+Update the existing `useEntrigEvent('opened', ...)` handler and cold-start handling to route by `event.type` and access fields from `event.data` using the shape in `data_shape`. Do not add a second global listener — extend the existing one.
 
 After `delete_notification`, remove stale routing for `deleted_notification_tap_contract.type` if no remaining notification uses that type.

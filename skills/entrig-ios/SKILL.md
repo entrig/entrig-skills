@@ -12,7 +12,7 @@ description: >
   notification CRUD.
 metadata:
   author: entrig
-  version: "1.0.1"
+  version: "1.0.2"
 ---
 
 # Entrig — Native iOS
@@ -149,7 +149,7 @@ if let notification = Entrig.getInitialNotification() {
 }
 ```
 
-When notification triggers are created or updated via the Entrig MCP, the MCP response includes `notification_tap_contract` with the notification `type` and `payload`. Immediately update the existing `onNotificationClick` handler so tapping that notification opens the correct screen. Do not add a second listener if one already exists — extend the existing `switch`.
+When notification triggers are created or updated via the Entrig MCP, the MCP response includes `notification_tap_contract` with the notification `type` and `data_shape` (the exact `notification.data` object the SDK delivers). Immediately update the existing `onNotificationClick` handler so tapping that notification opens the correct screen. Do not add a second listener if one already exists — extend the existing `switch`.
 
 When a notification is deleted via the MCP, remove stale routing for the deleted type if no remaining notification uses that type.
 
@@ -202,7 +202,7 @@ When the MCP returns `notification_tap_contract`, update the existing `onNotific
 | 6 | Setting `UNUserNotificationCenter.current().delegate` too late | Must be set in `didFinishLaunchingWithOptions` before the app finishes launching, or foreground notification delivery won't work. |
 | 7 | Listener set on a weak/deallocated object | Listeners are `weak` references. Set them on a retained object (e.g. a live view controller, not a temporary one). |
 | 8 | Not calling `Entrig.unregister()` before sign-out | The device keeps receiving notifications for the previous user after sign-out. |
-| 9 | Creating a notification but not updating tap routing | After MCP create/update, update `onNotificationClick` using `notification_tap_contract.type` and payload. After delete, remove stale routing if unused. |
+| 9 | Creating a notification but not updating tap routing | After MCP create/update, update `onNotificationClick` using `notification_tap_contract.type` and `data_shape`. After delete, remove stale routing if unused. |
 
 ## References
 

@@ -67,9 +67,9 @@ Creating a notification trigger only configures delivery. It does not automatica
 
 After `create_notification` or `update_notification` succeeds, read the MCP response:
 - `notification_tap_contract.type`
-- `notification_tap_contract.payload`
+- `notification_tap_contract.data_shape` — the exact object the SDK delivers as `event.data`
 
-Then update the Flutter app's existing `Entrig.onNotificationOpened.listen(...)` handler to route by `event.type` and use the payload fields from `event.data`.
+Then update the Flutter app's existing `Entrig.onNotificationOpened.listen(...)` handler to route by `event.type` and access fields from `event.data` using the shape in `data_shape`.
 
 After `delete_notification` succeeds, remove stale routing for `deleted_notification_tap_contract.type` if no remaining notification uses that type.
 
